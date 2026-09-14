@@ -23,7 +23,7 @@ Cette démo montre une worklist de 13 cas fictifs, avant (ordre d'arrivée) puis
 ## Stack technique
 
 - [Next.js](https://nextjs.org) (App Router) + TypeScript + Tailwind CSS
-- [API Anthropic (Claude)](https://docs.claude.com) appelée uniquement côté serveur
+- [API Google Gemini](https://ai.google.dev) appelée uniquement côté serveur
   (`src/app/api/analyze/route.ts`) via une route API Next.js — la clé API n'est jamais
   exposée au client
 - Images de scanner remplacées par des silhouettes SVG procédurales étiquetées "image
@@ -34,7 +34,7 @@ Cette démo montre une worklist de 13 cas fictifs, avant (ordre d'arrivée) puis
 ### Prérequis
 
 - Node.js 18.18+ (testé avec Node 26)
-- Une clé API Anthropic : [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys)
+- Une clé API Gemini : [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
 
 ### Installation
 
@@ -51,7 +51,7 @@ cp .env.example .env.local
 ```
 
 ```
-ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=...
 ```
 
 ### Développement
@@ -78,11 +78,11 @@ src/
 │   ├── layout.tsx          # layout racine + bandeau disclaimer permanent
 │   ├── page.tsx             # accueil : contexte Aidoc, stats, philosophie
 │   ├── worklist/page.tsx    # démo principale avant/après
-│   └── api/analyze/route.ts # appel serveur à Claude (jamais côté client)
+│   └── api/analyze/route.ts # appel serveur à Gemini (jamais côté client)
 ├── components/               # UI (worklist, panneau détail, badges, SVG, nav)
 └── lib/
     ├── cases.ts              # 13 cas fictifs (dataset statique)
-    ├── claude.ts             # client Anthropic + sortie structurée (Zod)
+    ├── gemini.ts              # client Google GenAI + sortie structurée (JSON schema + Zod)
     ├── prompts.ts             # system prompt du triage (outil de tri, pas de diagnostic)
     └── types.ts               # types partagés
 ```
@@ -93,7 +93,7 @@ Voir les instructions étape par étape fournies séparément, ou en résumé :
 
 1. Pousse ce repo sur GitHub.
 2. Sur [vercel.com/new](https://vercel.com/new), importe le repo.
-3. Ajoute la variable d'environnement `ANTHROPIC_API_KEY` dans Project Settings →
+3. Ajoute la variable d'environnement `GEMINI_API_KEY` dans Project Settings →
    Environment Variables (valeur secrète, jamais committée).
 4. Déploie — Vercel détecte automatiquement Next.js.
 
