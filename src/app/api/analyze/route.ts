@@ -25,6 +25,7 @@ export async function POST() {
           { status: 429 },
         );
       }
+      console.error("Erreur API Gemini:", error.status, error.message);
       return NextResponse.json(
         { error: `Erreur API Gemini : ${error.message}` },
         { status: 502 },

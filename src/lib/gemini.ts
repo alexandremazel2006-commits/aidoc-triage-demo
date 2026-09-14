@@ -1,6 +1,6 @@
 import "server-only";
 
-import { GoogleGenAI } from "@google/genai";
+import { ApiError, GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
 import { TRIAGE_SYSTEM_PROMPT } from "./prompts";
@@ -8,7 +8,7 @@ import type { Case, TriageResult } from "./types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const MODEL = "gemini-3.8-flash";
+const MODEL = "gemini-3.6-flash";
 
 const TriageResultSchema = z.object({
   caseId: z.string(),
@@ -68,26 +68,57 @@ function buildUserPrompt(cases: Case[]): string {
 ${casesBlock}`;
 }
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// L'API Gemini renvoie parfois un 503 "UNAVAILABLE" transitoire sous forte
+// charge. On retente quelques fois avant d'abandonner, pour ne pas faire
+// dépendre la démo live d'un seul essai.
+const RETRY_DELAYS_MS = [800, 2000, 4000];
+
 export async function analyzeCases(cases: Case[]): Promise<TriageResult[]> {
   if (!process.env.GEMINI_API_KEY) {
     throw new MissingApiKeyError();
   }
 
-  const response = await ai.models.generateContent({
-    model: MODEL,
-    contents: buildUserPrompt(cases),
-    config: {
-      systemInstruction: TRIAGE_SYSTEM_PROMPT,
-      responseMimeType: "application/json",
-      responseSchema: RESPONSE_SCHEMA,
-    },
-  });
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
+    try {
+      const response = await ai.models.generateContent({
+        model: MODEL,
+        contents: buildUserPrompt(cases),
+        config: {
+          systemInstruction: TRIAGE_SYSTEM_PROMPT,
+          responseMimeType: "application/json",
+          responseSchema: RESPONSE_SCHEMA,
+          // Classification simple, pas besoin de raisonnement étendu — le
+          // désactiver ramène la latence de dizaines de secondes à
+          // quelques secondes, essentiel pour une démo en direct.
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      });
 
-  const raw = response.text;
-  if (!raw) {
-    throw new Error("Gemini n'a pas renvoyé de sortie exploitable.");
+      const raw = response.text;
+      if (!raw) {
+        throw new Error("Gemini n'a pas renvoyé de sortie exploitable.");
+      }
+
+      const parsed = TriageResponseSchema.parse(JSON.parse(raw));
+      return parsed.results;
+    } catch (error) {
+      lastError = error;
+      const isRetryable =
+        error instanceof ApiError &&
+        (error.status === 503 || error.status === 429);
+      if (!isRetryable || attempt === RETRY_DELAYS_MS.length) {
+        throw error;
+      }
+      console.warn(
+        `Gemini indisponible (tentative ${attempt + 1}/${RETRY_DELAYS_MS.length + 1}), nouvel essai dans ${RETRY_DELAYS_MS[attempt]}ms…`,
+      );
+      await sleep(RETRY_DELAYS_MS[attempt]);
+    }
   }
-
-  const parsed = TriageResponseSchema.parse(JSON.parse(raw));
-  return parsed.results;
+  throw lastError;
 }
