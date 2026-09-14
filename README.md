@@ -17,7 +17,7 @@ IA de triage radiologique, pour une présentation orale / étude de cas académi
   l'IA change *quand* un cas est vu, jamais *qui* est responsable.
 
 Cette démo montre une worklist de 13 cas fictifs, avant (ordre d'arrivée) puis après
-(triée par un score d'urgence généré par Claude), avec un panneau de détail
+(triée par un score d'urgence généré par Gemini), avec un panneau de détail
 "human-in-the-loop" où le radiologue confirme ou rejette la priorité proposée.
 
 ## Stack technique

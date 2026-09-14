@@ -134,7 +134,7 @@ export function WorklistView() {
             ? "Analyse en cours…"
             : hasAnalysis
               ? "Relancer le tri IA"
-              : "Lancer le tri IA (Claude)"}
+              : "Lancer le tri IA (Gemini)"}
         </button>
       </div>
 
