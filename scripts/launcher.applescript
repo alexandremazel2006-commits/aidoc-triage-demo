@@ -6,7 +6,7 @@ on run
 		set isRunning to true
 	end try
 	if isRunning is false then
-		do shell script "cd " & quoted form of projectPath & " && (/opt/homebrew/bin/npm run dev > /tmp/aidoc-dev.log 2>&1 &) ; sleep 1"
+		do shell script "cd " & quoted form of projectPath & " && (export PATH=\"/opt/homebrew/bin:$PATH\"; nohup /opt/homebrew/bin/npm run dev > /tmp/aidoc-dev.log 2>&1 &) ; sleep 1"
 		delay 2
 	end if
 	-- Ouvre Chrome en "mode appli" : pas de barre d'adresse ni d'onglets,
