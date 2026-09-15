@@ -1,5 +1,17 @@
 # Interactive demo — Aidoc, AI radiology triage
 
+Two educational, academic-case-study demos live in this repo:
+
+1. **[Aidoc worklist demo](#aidoc-worklist-demo)** (below) — a Next.js app illustrating how
+   Aidoc's AI *reorders* a radiology worklist by urgency, using Claude for the reasoning.
+2. **[RadioCheck AI](#radiocheck-ai)** — a real, locally-run chest X-ray *analysis* tool
+   (Next.js frontend + Python/FastAPI backend running an actual pretrained medical CV
+   model — no LLM, no API key) with Grad-CAM explainability and a draft report generator.
+
+Neither is a certified medical device. See each section's disclaimer.
+
+## Aidoc worklist demo
+
 Educational, fictional demonstration of how [Aidoc](https://www.aidoc.com), an AI radiology
 triage system, works — built for an oral presentation / academic case study.
 
@@ -98,6 +110,69 @@ See the step-by-step instructions provided separately, or in short:
 3. Add the `ANTHROPIC_API_KEY` environment variable under Project Settings →
    Environment Variables (secret value, never committed).
 4. Deploy — Vercel auto-detects Next.js.
+
+## RadioCheck AI
+
+> ⚠️ Research & educational use only — not intended for clinical diagnosis. University
+> prototype, not a certified medical device.
+
+A second, more ambitious demo living in the same repo: upload a chest X-ray and a real,
+locally-run pretrained model ([TorchXRayVision](https://github.com/mlmed/torchxrayvision))
+scores it across 18 pathologies — no LLM, no API key, works fully offline after the one-time
+model download. Includes a real Grad-CAM explainability heatmap, a deterministic (non-LLM)
+draft report generator, a radiologist review workflow, and a persisted history/queue/
+dashboard — all backed by a Python/FastAPI service with its own SQLite database.
+
+Full details (architecture, exact model/dataset provenance, setup, troubleshooting) live in
+**[`backend/README.md`](backend/README.md)**. Quick start:
+
+```bash
+# Terminal 1 — backend
+cd backend
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+python test_model.py tests/fixtures/sample_chest_xray.png   # sanity check first
+uvicorn app.main:app --reload --port 8000
+
+# Terminal 2 — frontend (repo root, same Next.js app as the Aidoc demo)
+npm install
+npm run dev
+```
+
+Then open [http://localhost:3000/radiocheck](http://localhost:3000/radiocheck).
+
+### Pages
+
+| Route | Purpose |
+|---|---|
+| `/radiocheck` | Landing page |
+| `/analyze` | Upload a chest X-ray, run the model, see results |
+| `/exams/[id]` | Full record: image, findings, Grad-CAM, draft report, review |
+| `/dashboard` | Live stats + recent examinations, computed from the real DB |
+| `/queue` | Worklist sorted by demo priority, with filters |
+| `/history` | Search/filter all saved analyses |
+| `/about-ai` | Model, datasets, supported pathologies, and limitations |
+
+### What's real vs. simulated
+
+| | |
+|---|---|
+| Model inference | **Real** — actual DenseNet121 forward pass, no mocked scores |
+| Grad-CAM heatmap | **Real** — computed from the model's own gradients, class-discriminative |
+| Priority (CRITICAL/HIGH/MEDIUM/LOW) | Simulated — demo-only thresholds, see `priority_engine.py` |
+| Draft report | Deterministic template from real scores — not an LLM, no invented findings |
+| "Abnormal" demo examples | None bundled — see `/about-ai` and the Demo Mode note below |
+
+### Backend tests
+
+```bash
+cd backend && source venv/bin/activate && python -m pytest -v
+```
+
+Real integration tests (real model, temporary SQLite) — see `backend/README.md`.
+
+No real patient images are used here either; the model is a general-purpose open-source
+checkpoint, not fine-tuned on anything in this repo.
 
 ## Credits
 

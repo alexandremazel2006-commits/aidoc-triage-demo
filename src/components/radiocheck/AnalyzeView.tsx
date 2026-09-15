@@ -14,6 +14,17 @@ import { UploadZone } from "./UploadZone";
 
 const RESULTS_PREVIEW_COUNT = 5;
 
+// Only 2 examples, not 3: these are the only chest X-rays (as opposed to
+// CT, or non-chest) in this repo's openly-licensed image set — the model
+// only works on chest X-rays. Both show normal anatomy (per their real
+// source captions) — we don't fabricate an "abnormal" example. See
+// /about-ai and README.md ("RadioCheck AI" section) for how to source
+// additional examples (e.g. NIH ChestX-ray14) yourself.
+const DEMO_EXAMPLES = [
+  { path: "/images/cases/c4.png", label: "Demo 1 — pre-operative check" },
+  { path: "/images/cases/c12.jpg", label: "Demo 2 — post-operative check" },
+];
+
 export function AnalyzeView() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -32,6 +43,14 @@ export function AnalyzeView() {
     setPreviewUrl(URL.createObjectURL(selected));
     setResult(null);
     setError(null);
+  }
+
+  async function loadDemoExample(path: string) {
+    const res = await fetch(path);
+    const blob = await res.blob();
+    const name = path.split("/").pop() ?? "demo.png";
+    const demoFile = new File([blob], name, { type: blob.type || "image/png" });
+    handleFileSelected(demoFile);
   }
 
   async function handleRunAnalysis() {
@@ -78,6 +97,19 @@ export function AnalyzeView() {
             selectedFile={file}
             previewUrl={previewUrl}
           />
+
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-slate-400">Or load a demo example:</span>
+            {DEMO_EXAMPLES.map((demo) => (
+              <button
+                key={demo.path}
+                onClick={() => loadDemoExample(demo.path)}
+                className="rounded-md border border-slate-300 bg-white px-2.5 py-1 font-medium text-slate-600 hover:bg-slate-50"
+              >
+                {demo.label}
+              </button>
+            ))}
+          </div>
 
           <div className="rounded-lg border border-slate-200 bg-white p-4">
             <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
