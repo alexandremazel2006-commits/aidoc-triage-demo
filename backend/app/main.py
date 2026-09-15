@@ -5,11 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.exams import router as exams_router
 from app.config import settings
+from app.database import Base, engine
+from app.models import exam as _exam_models  # noqa: F401 — registers tables
 from app.services.ai_model import get_loaded_device, load_model
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
     # Load the model exactly once, at process startup — never per-request.
     load_model()
     print(f"[RadioCheck AI] Model loaded on device: {get_loaded_device()}")

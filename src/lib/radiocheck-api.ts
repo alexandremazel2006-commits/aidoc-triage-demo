@@ -9,6 +9,7 @@ export interface Prediction {
 }
 
 export interface AnalyzeResult {
+  exam_id: string;
   patient_id: string;
   patient_age: number | null;
   patient_sex: string | null;
