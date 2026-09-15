@@ -1,10 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
 
 import { formatArrival } from "@/lib/cases";
 import type { AnalyzedCase } from "@/lib/types";
 
+import { ImageLightbox } from "./ImageLightbox";
 import { ScanIllustration } from "./ScanIllustration";
 import { UrgencyBadge } from "./UrgencyBadge";
 
@@ -17,6 +19,16 @@ export function CaseDetailPanel({
   onClose: () => void;
   onDecision: (decision: "confirmed" | "rejected") => void;
 }) {
+  const [showLightbox, setShowLightbox] = useState(false);
+
+  // Close the lightbox if the selected case changes underneath it (adjusting
+  // state during render, per React's guidance — no effect needed here).
+  const [lastCaseId, setLastCaseId] = useState(data?.id);
+  if (data?.id !== lastCaseId) {
+    setLastCaseId(data?.id);
+    setShowLightbox(false);
+  }
+
   return (
     <AnimatePresence>
       {data && (
@@ -56,6 +68,7 @@ export function CaseDetailPanel({
                   kind={data.scanKind}
                   image={data.image}
                   className="h-20 w-20 shrink-0"
+                  onClick={() => setShowLightbox(true)}
                 />
                 <div>
                   <div className="text-base font-semibold text-slate-900">
@@ -70,6 +83,12 @@ export function CaseDetailPanel({
                   <div className="text-xs text-slate-400">
                     Arrived {formatArrival(data.arrivalOffsetMinutes)}
                   </div>
+                  <button
+                    onClick={() => setShowLightbox(true)}
+                    className="mt-0.5 text-xs text-blue-600 hover:underline"
+                  >
+                    🔍 Click photo to enlarge
+                  </button>
                 </div>
               </div>
 
@@ -158,6 +177,15 @@ export function CaseDetailPanel({
               </div>
             </div>
           </motion.div>
+
+          <ImageLightbox
+            open={showLightbox}
+            image={data.image}
+            scanKind={data.scanKind}
+            attribution={data.attribution}
+            caption={`${data.examType} — ${data.bodyPart}`}
+            onClose={() => setShowLightbox(false)}
+          />
         </>
       )}
     </AnimatePresence>

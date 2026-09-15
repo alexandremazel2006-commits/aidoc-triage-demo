@@ -68,28 +68,43 @@ export function ScanIllustration({
   kind,
   image,
   className = "",
+  fit = "cover",
+  hideLabel = false,
+  onClick,
 }: {
   kind: ScanKind;
   image?: string;
   className?: string;
+  fit?: "cover" | "contain";
+  hideLabel?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-md bg-slate-900 ${className}`}
+      className={`relative overflow-hidden rounded-md bg-slate-900 ${
+        onClick ? "cursor-zoom-in" : ""
+      } ${className}`}
+      onClick={onClick}
       aria-hidden
     >
       {image ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={image} alt="" className="h-full w-full object-cover" />
+        <img
+          src={image}
+          alt=""
+          className={`h-full w-full ${fit === "cover" ? "object-cover" : "object-contain"}`}
+        />
       ) : (
         <svg viewBox="0 0 100 100" className="h-full w-full">
           <rect x="0" y="0" width="100" height="100" fill="#0f172a" />
           <Silhouette kind={kind} />
         </svg>
       )}
-      <span className="absolute bottom-0.5 left-0.5 right-0.5 rounded-sm bg-black/50 px-1 py-0.5 text-center text-[6px] uppercase tracking-wide text-slate-300">
-        Illustrative image
-      </span>
+      {!hideLabel && (
+        <span className="absolute bottom-0.5 left-0.5 right-0.5 rounded-sm bg-black/50 px-1 py-0.5 text-center text-[6px] uppercase tracking-wide text-slate-300">
+          Illustrative image
+        </span>
+      )}
     </div>
   );
 }
