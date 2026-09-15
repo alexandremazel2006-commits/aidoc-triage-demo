@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -90,6 +92,7 @@ def list_exams(db: Session = Depends(get_db)):
             review_status=e.review_status,
             top_finding=e.top_finding,
             top_score=e.top_score,
+            processing_time=e.processing_time,
         )
         for e in exams
     ]
@@ -100,4 +103,18 @@ def get_exam(exam_id: str, db: Session = Depends(get_db)):
     exam = db.get(Exam, exam_id)
     if exam is None:
         raise HTTPException(status_code=404, detail="Exam not found.")
-    return exam
+    return ExamDetailOut(
+        id=exam.id,
+        patient_id=exam.patient_id,
+        patient_age=exam.patient_age,
+        patient_sex=exam.patient_sex,
+        clinical_indication=exam.clinical_indication,
+        image_url=f"/uploads/{Path(exam.image_path).name}",
+        created_at=exam.created_at,
+        processing_time=exam.processing_time,
+        priority=exam.priority,
+        review_status=exam.review_status,
+        predictions=[
+            PredictionOut(condition=p.condition, score=p.score) for p in exam.predictions
+        ],
+    )

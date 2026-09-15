@@ -31,6 +31,7 @@ class ExamSummaryOut(BaseModel):
     review_status: str
     top_finding: str | None
     top_score: float | None = None
+    processing_time: float
 
 
 class ExamDetailOut(BaseModel):
@@ -41,7 +42,7 @@ class ExamDetailOut(BaseModel):
     patient_age: int | None
     patient_sex: str | None
     clinical_indication: str | None
-    image_path: str
+    image_url: str
     created_at: datetime
     processing_time: float
     priority: str

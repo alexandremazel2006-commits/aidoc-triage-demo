@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.exams import router as exams_router
 from app.config import settings
@@ -35,6 +36,11 @@ app.add_middleware(
 )
 
 app.include_router(exams_router)
+app.mount(
+    "/uploads",
+    StaticFiles(directory=settings.upload_dir),
+    name="uploads",
+)
 
 
 @app.get("/health")

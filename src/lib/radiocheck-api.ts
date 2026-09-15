@@ -1,7 +1,9 @@
 "use client";
 
-const API_BASE_URL =
+export const RADIOCHECK_API_BASE_URL =
   process.env.NEXT_PUBLIC_RADIOCHECK_API_URL ?? "http://localhost:8000";
+
+export type Priority = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
 
 export interface Prediction {
   condition: string;
@@ -15,7 +17,7 @@ export interface AnalyzeResult {
   patient_sex: string | null;
   clinical_indication: string | null;
   predictions: Prediction[];
-  priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+  priority: Priority;
   processing_time_seconds: number;
 }
 
@@ -27,7 +29,52 @@ export interface AnalyzeParams {
   clinicalIndication?: string;
 }
 
+export interface ExamSummary {
+  id: string;
+  patient_id: string;
+  created_at: string;
+  priority: Priority;
+  review_status: string;
+  top_finding: string | null;
+  top_score: number | null;
+  processing_time: number;
+}
+
+export interface ExamDetail {
+  id: string;
+  patient_id: string;
+  patient_age: number | null;
+  patient_sex: string | null;
+  clinical_indication: string | null;
+  image_url: string;
+  created_at: string;
+  processing_time: number;
+  priority: Priority;
+  review_status: string;
+  predictions: Prediction[];
+}
+
 export class RadioCheckApiError extends Error {}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(`${RADIOCHECK_API_BASE_URL}${path}`, init);
+  } catch {
+    throw new RadioCheckApiError(
+      "Could not reach the RadioCheck AI backend. Is it running on http://localhost:8000?",
+    );
+  }
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new RadioCheckApiError(
+      body?.detail ?? `Request failed (HTTP ${response.status}).`,
+    );
+  }
+
+  return response.json();
+}
 
 export async function analyzeExam(params: AnalyzeParams): Promise<AnalyzeResult> {
   const formData = new FormData();
@@ -39,24 +86,16 @@ export async function analyzeExam(params: AnalyzeParams): Promise<AnalyzeResult>
     formData.append("clinical_indication", params.clinicalIndication);
   }
 
-  let response: Response;
-  try {
-    response = await fetch(`${API_BASE_URL}/api/exams/analyze`, {
-      method: "POST",
-      body: formData,
-    });
-  } catch {
-    throw new RadioCheckApiError(
-      "Could not reach the RadioCheck AI backend. Is it running on http://localhost:8000?",
-    );
-  }
+  return request<AnalyzeResult>("/api/exams/analyze", {
+    method: "POST",
+    body: formData,
+  });
+}
 
-  if (!response.ok) {
-    const body = await response.json().catch(() => null);
-    throw new RadioCheckApiError(
-      body?.detail ?? `Analysis failed (HTTP ${response.status}).`,
-    );
-  }
+export function listExams(): Promise<ExamSummary[]> {
+  return request<ExamSummary[]>("/api/exams");
+}
 
-  return response.json();
+export function getExam(id: string): Promise<ExamDetail> {
+  return request<ExamDetail>(`/api/exams/${id}`);
 }
