@@ -5,8 +5,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Palette sobre bleu/gris volontairement fixe (pas de bascule sombre
-   automatique) — dashboard hospitalier destiné à une présentation. */
+/* Deliberately fixed neutral blue/gray palette (no automatic dark mode) —
+   hospital-dashboard look meant for a live presentation. */
 body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }

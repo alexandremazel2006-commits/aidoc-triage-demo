@@ -1,8 +1,8 @@
 const STATS = [
-  { value: "~2 000", label: "hôpitaux équipés" },
-  { value: "~60M", label: "cas analysés / an" },
-  { value: "31+", label: "autorisations FDA (510(k))" },
-  { value: "14", label: "pathologies couvertes (modèle 2026)" },
+  { value: "~2,000", label: "hospitals equipped" },
+  { value: "~60M", label: "cases analyzed / year" },
+  { value: "31+", label: "FDA clearances (510(k))" },
+  { value: "14", label: "pathologies covered (2026 model)" },
 ];
 
 export function StatsStrip() {

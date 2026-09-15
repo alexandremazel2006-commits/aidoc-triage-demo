@@ -7,7 +7,7 @@ const STYLES: Record<UrgencyCategory, string> = {
 };
 
 const LABELS: Record<UrgencyCategory, string> = {
-  critical: "Critique",
+  critical: "Critical",
   urgent: "Urgent",
   routine: "Routine",
 };

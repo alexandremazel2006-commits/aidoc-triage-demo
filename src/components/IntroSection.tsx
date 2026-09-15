@@ -1,15 +1,15 @@
 const POINTS = [
   {
-    title: "Le problème : une file d'attente aveugle",
-    body: "Dans un service de radiologie, les examens s'accumulent dans l'ordre d'arrivée (FIFO), sans aucun signal de priorité clinique. Un cas critique — AVC, embolie pulmonaire, hémorragie — peut donc attendre derrière plusieurs examens de routine, simplement parce qu'il est arrivé après eux.",
+    title: "The problem: a queue with no clinical priority",
+    body: "In a radiology department, exams pile up in the order they arrive (FIFO), with no signal of clinical urgency. A critical case — stroke, pulmonary embolism, hemorrhage — can end up waiting behind several routine exams simply because it arrived after them.",
   },
   {
-    title: "Ce qu'Aidoc fait : re-prioriser, jamais diagnostiquer",
-    body: "Quelques minutes après l'acquisition d'un scanner, l'IA l'analyse en arrière-plan directement dans le PACS (le logiciel déjà utilisé par l'hôpital). Si elle détecte un signe de gravité, le cas remonte en tête de la worklist du radiologue. Elle ne fait que réordonner la file — elle ne pose jamais de diagnostic.",
+    title: "What Aidoc does: re-prioritize, never diagnose",
+    body: "A few minutes after a scan is acquired, the AI analyzes it in the background, directly inside the PACS (the software the hospital already uses). If it detects a sign of severity, the case moves to the top of the radiologist's worklist. It only reorders the queue — it never makes a diagnosis.",
   },
   {
-    title: "Ce qui ne change pas : la responsabilité médicale",
-    body: "Le radiologue continue de lire et d'interpréter chaque cas lui-même. C'est lui qui signe le compte-rendu final et reste seul responsable légalement. L'IA change QUAND un cas est vu — jamais QUI est responsable du diagnostic.",
+    title: "What doesn't change: medical accountability",
+    body: "The radiologist still reads and interprets every case themselves. They sign the final report and remain solely legally responsible. The AI changes WHEN a case is seen — never WHO is responsible for the diagnosis.",
   },
 ];
 
@@ -17,10 +17,9 @@ export function IntroSection() {
   return (
     <div className="space-y-8">
       <div className="rounded-lg border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-blue-900">
-        <span className="font-semibold">Philosophie centrale : </span>
-        « augmentation, pas automatisation ». L&apos;IA apporte la vitesse de
-        détection ; le radiologue apporte le jugement clinique et le contexte
-        patient.
+        <span className="font-semibold">Core philosophy: </span>
+        &ldquo;augmentation, not automation&rdquo;. The AI brings speed of detection; the
+        radiologist brings clinical judgment and patient context.
       </div>
 
       <div className="grid gap-6 sm:grid-cols-3">
@@ -41,15 +40,15 @@ export function IntroSection() {
 
       <div className="rounded-lg border border-slate-200 bg-white p-5 text-sm text-slate-600">
         <h3 className="text-sm font-semibold text-slate-900">
-          Un enjeu réel : la généralisabilité
+          A real challenge: generalizability
         </h3>
         <p className="mt-2 leading-relaxed">
-          Sur son modèle de fondation 2026 (14 pathologies), Aidoc annonce
-          97 % de sensibilité et 98 % de spécificité en validation interne.
-          Ces chiffres baissent en validation externe — hors des hôpitaux
-          d&apos;entraînement — où la spécificité peut chuter jusqu&apos;à 24
-          points. C&apos;est un vrai sujet de recherche pour ce type de
-          système, illustré ici de façon simplifiée.
+          On its 2026 foundation model (14 pathologies), Aidoc reports 97%
+          sensitivity and 98% specificity in internal validation. These
+          figures drop in external validation — outside the training
+          hospitals — where specificity can fall by up to 24 points. This is
+          a genuine research challenge for this type of system, illustrated
+          here in a simplified way.
         </p>
       </div>
     </div>

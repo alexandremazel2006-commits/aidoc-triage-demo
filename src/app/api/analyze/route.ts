@@ -1,12 +1,49 @@
 import { ApiError } from "@google/genai";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
-import { CASES } from "@/lib/cases";
 import { analyzeCases, MissingApiKeyError } from "@/lib/gemini";
 
-export async function POST() {
+const CaseInputSchema = z.object({
+  id: z.string(),
+  patientName: z.string(),
+  age: z.number(),
+  examType: z.enum(["CT", "X-ray"]),
+  bodyPart: z.string(),
+  scanKind: z.enum([
+    "head-ct",
+    "chest-xray",
+    "chest-ct",
+    "abdomen-ct",
+    "limb-xray",
+    "spine-xray",
+  ]),
+  arrivalOffsetMinutes: z.number(),
+  clinicalContext: z.string().min(1).max(2000),
+});
+
+const RequestSchema = z.object({
+  cases: z.array(CaseInputSchema).min(1).max(50),
+});
+
+export async function POST(request: Request) {
+  let body: unknown;
   try {
-    const results = await analyzeCases(CASES);
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+  }
+
+  const parsedBody = RequestSchema.safeParse(body);
+  if (!parsedBody.success) {
+    return NextResponse.json(
+      { error: "Invalid case list.", details: parsedBody.error.flatten() },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const results = await analyzeCases(parsedBody.data.cases);
     return NextResponse.json({ results });
   } catch (error) {
     if (error instanceof MissingApiKeyError) {
@@ -15,25 +52,25 @@ export async function POST() {
     if (error instanceof ApiError) {
       if (error.status === 401 || error.status === 403) {
         return NextResponse.json(
-          { error: "Clé API Gemini manquante ou invalide côté serveur." },
+          { error: "Missing or invalid Gemini API key on the server." },
           { status: 500 },
         );
       }
       if (error.status === 429) {
         return NextResponse.json(
-          { error: "Limite de débit API atteinte, réessaie dans un instant." },
+          { error: "API rate limit reached, please try again shortly." },
           { status: 429 },
         );
       }
-      console.error("Erreur API Gemini:", error.status, error.message);
+      console.error("Gemini API error:", error.status, error.message);
       return NextResponse.json(
-        { error: `Erreur API Gemini : ${error.message}` },
+        { error: `Gemini API error: ${error.message}` },
         { status: 502 },
       );
     }
-    console.error("Erreur d'analyse de triage:", error);
+    console.error("Triage analysis error:", error);
     return NextResponse.json(
-      { error: "Erreur inattendue pendant l'analyse de triage." },
+      { error: "Unexpected error during triage analysis." },
       { status: 500 },
     );
   }

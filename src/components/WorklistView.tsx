@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 
 import { CASES } from "@/lib/cases";
-import type { AnalyzedCase, TriageResult } from "@/lib/types";
+import type { AnalyzedCase, Case, TriageResult } from "@/lib/types";
 
+import { AddCaseForm } from "./AddCaseForm";
 import { CaseDetailPanel } from "./CaseDetailPanel";
 import { CaseRow } from "./CaseRow";
 
@@ -22,6 +23,7 @@ export function WorklistView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const hasAnalysis = cases.some((c) => c.triage !== null);
 
@@ -61,10 +63,24 @@ export function WorklistView() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/analyze", { method: "POST" });
+      const payload: Case[] = cases.map((c) => ({
+        id: c.id,
+        patientName: c.patientName,
+        age: c.age,
+        examType: c.examType,
+        bodyPart: c.bodyPart,
+        scanKind: c.scanKind,
+        arrivalOffsetMinutes: c.arrivalOffsetMinutes,
+        clinicalContext: c.clinicalContext,
+      }));
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cases: payload }),
+      });
       const body = await res.json();
       if (!res.ok) {
-        throw new Error(body.error ?? "Échec de l'analyse.");
+        throw new Error(body.error ?? "Analysis failed.");
       }
       const results: TriageResult[] = body.results;
       setCases((prev) =>
@@ -75,7 +91,7 @@ export function WorklistView() {
       );
       setSorted(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erreur inconnue.");
+      setError(e instanceof Error ? e.message : "Unknown error.");
     } finally {
       setLoading(false);
     }
@@ -90,6 +106,14 @@ export function WorklistView() {
     );
   }
 
+  function handleAddCase(newCase: Case) {
+    setCases((prev) => [
+      ...prev,
+      { ...newCase, triage: null, radiologistDecision: "pending" },
+    ]);
+    setShowAddForm(false);
+  }
+
   const selectedCase = cases.find((c) => c.id === selectedCaseId) ?? null;
 
   return (
@@ -97,7 +121,7 @@ export function WorklistView() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <h1 className="text-lg font-semibold text-slate-900">
-            Worklist radiologie
+            Radiology worklist
           </h1>
           {hasAnalysis && (
             <div className="flex overflow-hidden rounded-md border border-slate-300 text-xs font-medium">
@@ -109,7 +133,7 @@ export function WorklistView() {
                     : "bg-white text-slate-600 hover:bg-slate-50"
                 }`}
               >
-                Avant (FIFO)
+                Before (FIFO)
               </button>
               <button
                 onClick={() => setSorted(true)}
@@ -119,23 +143,31 @@ export function WorklistView() {
                     : "bg-white text-slate-600 hover:bg-slate-50"
                 }`}
               >
-                Après (triage IA)
+                After (AI triage)
               </button>
             </div>
           )}
         </div>
 
-        <button
-          onClick={runTriage}
-          disabled={loading}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading
-            ? "Analyse en cours…"
-            : hasAnalysis
-              ? "Relancer le tri IA"
-              : "Lancer le tri IA (Gemini)"}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+            + Add a case
+          </button>
+          <button
+            onClick={runTriage}
+            disabled={loading}
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading
+              ? "Analyzing…"
+              : hasAnalysis
+                ? "Re-run AI triage"
+                : "Run AI triage (Gemini)"}
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -150,13 +182,13 @@ export function WorklistView() {
             <span className="font-semibold text-red-700">
               {summary.critical}
             </span>{" "}
-            critique(s)
+            critical
           </span>
           <span>
             <span className="font-semibold text-amber-700">
               {summary.urgent}
             </span>{" "}
-            urgent(s)
+            urgent
           </span>
           <span>
             <span className="font-semibold text-slate-600">
@@ -186,6 +218,10 @@ export function WorklistView() {
         onClose={() => setSelectedCaseId(null)}
         onDecision={handleDecision}
       />
+
+      {showAddForm && (
+        <AddCaseForm onAdd={handleAddCase} onClose={() => setShowAddForm(false)} />
+      )}
     </div>
   );
 }

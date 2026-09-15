@@ -39,12 +39,12 @@ export function CaseDetailPanel({
           >
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <h2 className="text-sm font-semibold text-slate-900">
-                Détail du cas
+                Case detail
               </h2>
               <button
                 onClick={onClose}
                 className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                aria-label="Fermer"
+                aria-label="Close"
               >
                 ✕
               </button>
@@ -54,27 +54,35 @@ export function CaseDetailPanel({
               <div className="flex items-center gap-4">
                 <ScanIllustration
                   kind={data.scanKind}
+                  image={data.image}
                   className="h-20 w-20 shrink-0"
                 />
                 <div>
                   <div className="text-base font-semibold text-slate-900">
                     {data.patientName}{" "}
                     <span className="text-sm font-normal text-slate-400">
-                      ({data.age} ans)
+                      ({data.age})
                     </span>
                   </div>
                   <div className="text-sm text-slate-500">
                     {data.examType} — {data.bodyPart}
                   </div>
                   <div className="text-xs text-slate-400">
-                    Arrivé {formatArrival(data.arrivalOffsetMinutes)}
+                    Arrived {formatArrival(data.arrivalOffsetMinutes)}
                   </div>
                 </div>
               </div>
 
+              {data.attribution && (
+                <p className="text-[11px] text-slate-400">
+                  Photo: {data.attribution.license} ·{" "}
+                  {data.attribution.author} — Wikimedia Commons
+                </p>
+              )}
+
               <div>
                 <div className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">
-                  Contexte clinique (fictif)
+                  Clinical context (fictional)
                 </div>
                 <p className="text-sm text-slate-700">
                   {data.clinicalContext}
@@ -84,7 +92,7 @@ export function CaseDetailPanel({
               <div className="rounded-lg border border-slate-200 p-4">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                    Score de triage IA
+                    AI triage score
                   </div>
                   {data.triage ? (
                     <UrgencyBadge
@@ -93,7 +101,7 @@ export function CaseDetailPanel({
                     />
                   ) : (
                     <span className="text-xs text-slate-400">
-                      Pas encore analysé
+                      Not analyzed yet
                     </span>
                   )}
                 </div>
@@ -108,20 +116,20 @@ export function CaseDetailPanel({
                   </>
                 ) : (
                   <p className="text-sm text-slate-400">
-                    Lance le tri IA depuis la worklist pour voir le score et
-                    la justification de ce cas.
+                    Run the AI triage from the worklist to see this
+                    case&apos;s score and rationale.
                   </p>
                 )}
               </div>
 
               <div className="rounded-lg border border-blue-100 bg-blue-50 p-4">
                 <div className="mb-2 text-xs font-medium uppercase tracking-wide text-blue-800">
-                  Radiologue : validation humaine (human-in-the-loop)
+                  Radiologist: human validation (human-in-the-loop)
                 </div>
                 <p className="mb-3 text-xs leading-relaxed text-blue-900/80">
-                  L&apos;IA ne fait que proposer un ordre de priorité. Le
-                  radiologue garde toujours la main : c&apos;est lui qui lit
-                  le cas, l&apos;interprète et signe le compte-rendu.
+                  The AI only proposes a priority order. The radiologist
+                  always stays in control: they read the case, interpret it,
+                  and sign the report.
                 </p>
                 <div className="flex gap-2">
                   <button
@@ -133,7 +141,7 @@ export function CaseDetailPanel({
                         : "bg-white text-emerald-700 ring-1 ring-inset ring-emerald-300 hover:bg-emerald-50"
                     }`}
                   >
-                    ✓ Confirmer la priorité
+                    ✓ Confirm priority
                   </button>
                   <button
                     onClick={() => onDecision("rejected")}
@@ -144,7 +152,7 @@ export function CaseDetailPanel({
                         : "bg-white text-slate-600 ring-1 ring-inset ring-slate-300 hover:bg-slate-50"
                     }`}
                   >
-                    ✕ Rejeter la priorité
+                    ✕ Reject priority
                   </button>
                 </div>
               </div>

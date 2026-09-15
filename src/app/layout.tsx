@@ -16,15 +16,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Démo Aidoc — Triage radiologique IA",
+  title: "Aidoc Demo — AI Radiology Triage",
   description:
-    "Démonstration pédagogique du fonctionnement d'Aidoc, une IA de triage radiologique. Étude de cas académique, non cliniquement validée.",
+    "Educational demonstration of how Aidoc, an AI radiology triage system, works. Academic case study, not clinically validated.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="fr"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-slate-50 text-slate-900">

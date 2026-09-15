@@ -31,17 +31,26 @@ export function CaseRow({
         {rank}
       </div>
 
-      <ScanIllustration kind={data.scanKind} className="h-12 w-12 shrink-0" />
+      <ScanIllustration
+        kind={data.scanKind}
+        image={data.image}
+        className="h-12 w-12 shrink-0"
+      />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-medium text-slate-900">
             {data.patientName}
           </span>
-          <span className="text-xs text-slate-400">({data.age} ans)</span>
+          <span className="text-xs text-slate-400">({data.age})</span>
+          {data.isCustom && (
+            <span className="rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-600">
+              new
+            </span>
+          )}
         </div>
         <div className="truncate text-xs text-slate-500">
-          {data.examType} — {data.bodyPart} · arrivé {formatArrival(data.arrivalOffsetMinutes)}
+          {data.examType} — {data.bodyPart} · arrived {formatArrival(data.arrivalOffsetMinutes)}
         </div>
       </div>
 
@@ -61,7 +70,7 @@ export function CaseRow({
             score={data.triage.urgency_score}
           />
         ) : (
-          <span className="text-xs text-slate-300">en attente</span>
+          <span className="text-xs text-slate-300">pending</span>
         )}
       </div>
     </motion.button>

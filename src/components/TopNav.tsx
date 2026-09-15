@@ -9,18 +9,18 @@ export function TopNav() {
             A
           </span>
           <span className="text-sm font-semibold text-white">
-            Démo Aidoc — Triage radiologique IA
+            Aidoc Demo — AI Radiology Triage
           </span>
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/" className="text-slate-300 hover:text-white">
-            Contexte
+            Background
           </Link>
           <Link
             href="/worklist"
             className="rounded-md bg-blue-600 px-3 py-1.5 font-medium text-white hover:bg-blue-500"
           >
-            Voir la démo
+            View the demo
           </Link>
         </nav>
       </div>

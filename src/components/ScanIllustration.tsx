@@ -1,7 +1,7 @@
 import type { ScanKind } from "@/lib/types";
 
-// Silhouettes vectorielles abstraites — pas de vraie imagerie médicale.
-// Chaque vignette est explicitement étiquetée "image illustrative".
+// Abstract vector silhouettes used as a fallback when no photo is
+// available — not real medical imagery.
 function Silhouette({ kind }: { kind: ScanKind }) {
   const stroke = "#93a5c4";
   const fill = "none";
@@ -66,9 +66,11 @@ function Silhouette({ kind }: { kind: ScanKind }) {
 
 export function ScanIllustration({
   kind,
+  image,
   className = "",
 }: {
   kind: ScanKind;
+  image?: string;
   className?: string;
 }) {
   return (
@@ -76,12 +78,17 @@ export function ScanIllustration({
       className={`relative overflow-hidden rounded-md bg-slate-900 ${className}`}
       aria-hidden
     >
-      <svg viewBox="0 0 100 100" className="h-full w-full">
-        <rect x="0" y="0" width="100" height="100" fill="#0f172a" />
-        <Silhouette kind={kind} />
-      </svg>
+      {image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={image} alt="" className="h-full w-full object-cover" />
+      ) : (
+        <svg viewBox="0 0 100 100" className="h-full w-full">
+          <rect x="0" y="0" width="100" height="100" fill="#0f172a" />
+          <Silhouette kind={kind} />
+        </svg>
+      )}
       <span className="absolute bottom-0.5 left-0.5 right-0.5 rounded-sm bg-black/50 px-1 py-0.5 text-center text-[6px] uppercase tracking-wide text-slate-300">
-        Image illustrative
+        Illustrative image
       </span>
     </div>
   );

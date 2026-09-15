@@ -1,9 +1,12 @@
 import { Case } from "./types";
 
 /**
- * Cas fictifs pour la démonstration. Aucun patient réel, aucune donnée
- * médicale réelle. `arrivalOffsetMinutes` fixe l'ordre FIFO d'arrivée dans
- * le PACS (plus la valeur est grande, plus le cas est arrivé tôt).
+ * Fictional cases for this demonstration. No real patients, no real medical
+ * data. `arrivalOffsetMinutes` fixes the FIFO order in which cases arrived
+ * in the PACS (the larger the value, the earlier the case arrived).
+ *
+ * Photos: real, open-license radiology images (normal anatomy, no visible
+ * pathology) sourced from Wikimedia Commons. Full credits in README.md.
  */
 export const CASES: Case[] = [
   {
@@ -11,55 +14,87 @@ export const CASES: Case[] = [
     patientName: "Amara N.",
     age: 58,
     examType: "CT",
-    bodyPart: "Thorax",
+    bodyPart: "Chest",
     scanKind: "chest-ct",
     arrivalOffsetMinutes: 95,
     clinicalContext:
-      "Douleur thoracique brutale associée à une tachycardie et une légère désaturation ; suspicion d'embolie pulmonaire.",
+      "Sudden-onset chest pain with tachycardia and mild desaturation; suspected pulmonary embolism.",
+    image: "/images/cases/c1.jpg",
+    attribution: {
+      author: "Mikael Häggström, M.D.",
+      license: "CC0",
+      sourceUrl:
+        "https://commons.wikimedia.org/wiki/Scrollable_high-resolution_computed_tomography_images_of_a_normal_thorax",
+    },
   },
   {
     id: "c2",
     patientName: "Julien K.",
     age: 74,
     examType: "CT",
-    bodyPart: "Crâne",
+    bodyPart: "Head",
     scanKind: "head-ct",
     arrivalOffsetMinutes: 88,
     clinicalContext:
-      "Chute à domicile avec perte de connaissance brève ; patient anticoagulé, céphalées croissantes depuis la chute.",
+      "Fall at home with brief loss of consciousness; patient on anticoagulants, worsening headache since the fall.",
+    image: "/images/cases/c2.png",
+    attribution: {
+      author: "Mikael Häggström, M.D.",
+      license: "CC0",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:CT_of_a_normal_brain,_axial_10.png",
+    },
   },
   {
     id: "c3",
     patientName: "Sophie M.",
     age: 29,
     examType: "X-ray",
-    bodyPart: "Poignet",
+    bodyPart: "Wrist",
     scanKind: "limb-xray",
     arrivalOffsetMinutes: 82,
     clinicalContext:
-      "Douleur au poignet après une chute à vélo la veille, contrôle avant reprise du sport.",
+      "Wrist pain after a cycling fall the day before; check-up before returning to sport.",
+    image: "/images/cases/c3.jpg",
+    attribution: {
+      author: "Mikael Häggström, M.D.",
+      license: "CC0",
+      sourceUrl:
+        "https://commons.wikimedia.org/wiki/File:X-ray_of_normal_wrist_by_lateral_projection.jpg",
+    },
   },
   {
     id: "c4",
     patientName: "Marc T.",
     age: 61,
     examType: "X-ray",
-    bodyPart: "Thorax",
+    bodyPart: "Chest",
     scanKind: "chest-xray",
     arrivalOffsetMinutes: 76,
-    clinicalContext:
-      "Bilan pré-opératoire systématique avant chirurgie programmée du genou.",
+    clinicalContext: "Routine pre-operative work-up before scheduled knee surgery.",
+    image: "/images/cases/c4.png",
+    attribution: {
+      author: "Stillwaterising",
+      license: "CC0",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Chest_Xray_PA_3-8-2010.png",
+    },
   },
   {
     id: "c5",
     patientName: "Elena R.",
     age: 67,
     examType: "CT",
-    bodyPart: "Crâne",
+    bodyPart: "Head",
     scanKind: "head-ct",
     arrivalOffsetMinutes: 70,
     clinicalContext:
-      "Céphalée brutale et inhabituelle décrite comme 'la pire de sa vie', confusion transitoire ; suspicion d'AVC hémorragique.",
+      "Sudden, unusual headache described as 'the worst of her life', transient confusion; suspected hemorrhagic stroke.",
+    image: "/images/cases/c5.png",
+    attribution: {
+      author: "Mikael Häggström, M.D.",
+      license: "CC0",
+      sourceUrl:
+        "https://commons.wikimedia.org/wiki/File:CT_of_a_normal_brain_(thumbnail).png",
+    },
   },
   {
     id: "c6",
@@ -70,51 +105,82 @@ export const CASES: Case[] = [
     scanKind: "abdomen-ct",
     arrivalOffsetMinutes: 63,
     clinicalContext:
-      "Douleur abdominale diffuse d'apparition rapide, fièvre à 38,9°C, défense à la palpation.",
+      "Rapid-onset diffuse abdominal pain, fever at 38.9°C, guarding on palpation.",
+    image: "/images/cases/c6.png",
+    attribution: {
+      author: "Mikael Häggström, M.D.",
+      license: "CC0",
+      sourceUrl:
+        "https://commons.wikimedia.org/wiki/File:CT_of_a_normal_abdomen_and_pelvis,_axial_plane_94.png",
+    },
   },
   {
     id: "c7",
     patientName: "Nadia F.",
     age: 52,
     examType: "X-ray",
-    bodyPart: "Rachis lombaire",
+    bodyPart: "Lumbar spine",
     scanKind: "spine-xray",
     arrivalOffsetMinutes: 57,
-    clinicalContext:
-      "Lombalgie chronique connue, contrôle de suivi programmé à 6 mois.",
+    clinicalContext: "Known chronic lower back pain, scheduled 6-month follow-up.",
+    image: "/images/cases/c7.jpg",
+    attribution: {
+      author: "Bonepit Collection, UC San Diego",
+      license: "Public Domain",
+      sourceUrl:
+        "https://commons.wikimedia.org/wiki/File:X-ray_of_the_cervical_spine_of_a_20_year_old_male_-_lateral.jpg",
+    },
   },
   {
     id: "c8",
     patientName: "Thomas L.",
     age: 70,
     examType: "CT",
-    bodyPart: "Thorax",
+    bodyPart: "Chest",
     scanKind: "chest-ct",
     arrivalOffsetMinutes: 50,
     clinicalContext:
-      "Dyspnée d'aggravation progressive sur 48h, antécédent de cancer colique ; suspicion d'embolie pulmonaire.",
+      "Progressively worsening shortness of breath over 48h, history of colon cancer; suspected pulmonary embolism.",
+    image: "/images/cases/c8.jpg",
+    attribution: {
+      author: "Mikael Häggström, M.D.",
+      license: "CC0",
+      sourceUrl:
+        "https://commons.wikimedia.org/wiki/Scrollable_high-resolution_computed_tomography_images_of_a_normal_thorax",
+    },
   },
   {
     id: "c9",
     patientName: "Isabelle D.",
     age: 34,
     examType: "X-ray",
-    bodyPart: "Cheville",
+    bodyPart: "Ankle",
     scanKind: "limb-xray",
     arrivalOffsetMinutes: 44,
-    clinicalContext:
-      "Entorse de cheville lors d'un match de football, impossibilité d'appui.",
+    clinicalContext: "Ankle sprain during a football match, unable to bear weight.",
+    image: "/images/cases/c9.jpg",
+    attribution: {
+      author: "Mikael Häggström, M.D.",
+      license: "CC0",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:X-ray_of_normal_ankle_-_lateral.jpg",
+    },
   },
   {
     id: "c10",
     patientName: "Youssef A.",
     age: 22,
     examType: "CT",
-    bodyPart: "Crâne",
+    bodyPart: "Head",
     scanKind: "head-ct",
     arrivalOffsetMinutes: 37,
     clinicalContext:
-      "Traumatisme crânien léger sans perte de connaissance, bilan systématique aux urgences.",
+      "Mild head trauma with no loss of consciousness; routine work-up in the emergency department.",
+    image: "/images/cases/c10.jpg",
+    attribution: {
+      author: "Andrew Ciscel",
+      license: "CC BY-SA 2.0",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Head_CT_scan.jpg",
+    },
   },
   {
     id: "c11",
@@ -125,36 +191,56 @@ export const CASES: Case[] = [
     scanKind: "abdomen-ct",
     arrivalOffsetMinutes: 30,
     clinicalContext:
-      "Douleur en fosse iliaque droite depuis 12h avec nausées ; suspicion d'appendicite.",
+      "Right lower quadrant pain for 12 hours with nausea; suspected appendicitis.",
+    image: "/images/cases/c11.png",
+    attribution: {
+      author: "Mikael Häggström, M.D.",
+      license: "CC0",
+      sourceUrl:
+        "https://commons.wikimedia.org/wiki/File:CT_of_a_normal_abdomen_and_pelvis,_axial_plane_22.png",
+    },
   },
   {
     id: "c12",
     patientName: "Hugo V.",
     age: 55,
     examType: "X-ray",
-    bodyPart: "Thorax",
+    bodyPart: "Chest",
     scanKind: "chest-xray",
     arrivalOffsetMinutes: 18,
-    clinicalContext:
-      "Contrôle radiologique de routine post-opératoire, patient asymptomatique.",
+    clinicalContext: "Routine post-operative check, asymptomatic patient.",
+    image: "/images/cases/c12.jpg",
+    attribution: {
+      author: "Mikael Häggström, M.D.",
+      license: "CC0",
+      sourceUrl:
+        "https://commons.wikimedia.org/wiki/File:Normal_posteroanterior_(PA)_chest_radiograph_(X-ray).jpg",
+    },
   },
   {
     id: "c13",
     patientName: "Aisha O.",
     age: 63,
     examType: "CT",
-    bodyPart: "Crâne",
+    bodyPart: "Head",
     scanKind: "head-ct",
     arrivalOffsetMinutes: 8,
     clinicalContext:
-      "Faiblesse brutale de l'hémicorps droit et trouble soudain de la parole débutés il y a 40 minutes ; suspicion d'AVC aigu.",
+      "Sudden right-sided weakness and slurred speech that started 40 minutes ago; suspected acute stroke.",
+    image: "/images/cases/c13.jpg",
+    attribution: {
+      author: "Goleisureintl",
+      license: "CC BY 4.0",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:CT_Brain_Scan.jpg",
+    },
   },
 ];
 
 export function formatArrival(offsetMinutes: number): string {
+  if (offsetMinutes <= 0) return "just now";
   const hours = Math.floor(offsetMinutes / 60);
   const minutes = offsetMinutes % 60;
-  if (hours === 0) return `il y a ${minutes} min`;
-  if (minutes === 0) return `il y a ${hours} h`;
-  return `il y a ${hours} h ${minutes} min`;
+  if (hours === 0) return `${minutes} min ago`;
+  if (minutes === 0) return `${hours} h ago`;
+  return `${hours} h ${minutes} min ago`;
 }
