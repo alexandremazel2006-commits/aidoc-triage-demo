@@ -54,6 +54,13 @@ export interface ExamDetail {
   predictions: Prediction[];
 }
 
+export interface HeatmapResult {
+  condition: string;
+  image_base64: string;
+  heatmap_base64: string;
+  available_conditions: string[];
+}
+
 export class RadioCheckApiError extends Error {}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -98,4 +105,10 @@ export function listExams(): Promise<ExamSummary[]> {
 
 export function getExam(id: string): Promise<ExamDetail> {
   return request<ExamDetail>(`/api/exams/${id}`);
+}
+
+export function getHeatmap(id: string, condition: string): Promise<HeatmapResult> {
+  return request<HeatmapResult>(
+    `/api/exams/${id}/heatmap?condition=${encodeURIComponent(condition)}`,
+  );
 }

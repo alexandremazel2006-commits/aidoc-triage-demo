@@ -1,16 +1,30 @@
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.exam import Exam, Prediction
-from app.schemas.exam import AnalyzeResponse, ExamDetailOut, ExamSummaryOut, PredictionOut
+from app.schemas.exam import (
+    AnalyzeResponse,
+    ExamDetailOut,
+    ExamSummaryOut,
+    HeatmapResponse,
+    PredictionOut,
+)
+from app.services.ai_model import get_model
+from app.services.gradcam import UnknownConditionError, array_to_grayscale_png, compute_gradcam
 from app.services.prediction import run_inference
-from app.services.preprocessing import InvalidImageError, preprocess_image_bytes
+from app.services.preprocessing import (
+    InvalidImageError,
+    normalized_array_to_uint8,
+    preprocess_image_bytes,
+    preprocess_image_bytes_full,
+)
 from app.services.priority_engine import compute_priority
 from app.utils.files import (
     UploadValidationError,
@@ -117,4 +131,35 @@ def get_exam(exam_id: str, db: Session = Depends(get_db)):
         predictions=[
             PredictionOut(condition=p.condition, score=p.score) for p in exam.predictions
         ],
+    )
+
+
+@router.get("/{exam_id}/heatmap", response_model=HeatmapResponse)
+def get_heatmap(exam_id: str, condition: str = Query(...), db: Session = Depends(get_db)):
+    exam = db.get(Exam, exam_id)
+    if exam is None:
+        raise HTTPException(status_code=404, detail="Exam not found.")
+
+    try:
+        file_bytes = Path(exam.image_path).read_bytes()
+    except OSError as exc:
+        raise HTTPException(
+            status_code=404, detail=f"Original image file is missing: {exc}"
+        ) from exc
+
+    image_tensor, normalized_array = preprocess_image_bytes_full(file_bytes)
+
+    try:
+        heatmap_png = compute_gradcam(image_tensor, condition)
+    except UnknownConditionError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    original_png = array_to_grayscale_png(normalized_array_to_uint8(normalized_array))
+
+    model = get_model()
+    return HeatmapResponse(
+        condition=condition,
+        image_base64=base64.b64encode(original_png).decode("ascii"),
+        heatmap_base64=base64.b64encode(heatmap_png).decode("ascii"),
+        available_conditions=[p for p in model.pathologies if p],
     )

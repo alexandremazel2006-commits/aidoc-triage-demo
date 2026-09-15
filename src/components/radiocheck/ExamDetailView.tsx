@@ -9,6 +9,7 @@ import {
   RadioCheckApiError,
 } from "@/lib/radiocheck-api";
 
+import { GradCamPanel } from "./GradCamPanel";
 import { PriorityBadge } from "./PriorityBadge";
 
 const RESULTS_PREVIEW_COUNT = 5;
@@ -114,6 +115,14 @@ export function ExamDetailView({ examId }: { examId: string }) {
             </p>
           </div>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <GradCamPanel
+          examId={exam.id}
+          defaultCondition={exam.predictions[0]?.condition ?? ""}
+          conditionOptions={exam.predictions.map((p) => p.condition)}
+        />
       </div>
     </div>
   );

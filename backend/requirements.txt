@@ -7,3 +7,4 @@ eval_type_backport
 torch
 torchvision
 torchxrayvision
+pillow

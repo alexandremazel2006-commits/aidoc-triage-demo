@@ -48,3 +48,10 @@ class ExamDetailOut(BaseModel):
     priority: str
     review_status: str
     predictions: list[PredictionOut]
+
+
+class HeatmapResponse(BaseModel):
+    condition: str
+    image_base64: str = Field(..., description="PNG, base64-encoded — the 224x224 preprocessed image the model actually saw.")
+    heatmap_base64: str = Field(..., description="PNG, base64-encoded — real Grad-CAM heatmap for `condition`.")
+    available_conditions: list[str]
