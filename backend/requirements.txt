@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic-settings
+sqlalchemy
+eval_type_backport
+torch
+torchvision
+torchxrayvision

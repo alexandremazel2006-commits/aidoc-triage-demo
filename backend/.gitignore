@@ -1,0 +1,13 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Local database and uploaded files
+*.db
+uploads/*
+!uploads/.gitkeep
+
+# Env
+.env

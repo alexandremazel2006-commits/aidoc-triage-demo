@@ -1,8 +1,8 @@
-import { ApiError } from "@google/genai";
+import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { analyzeCases, MissingApiKeyError } from "@/lib/gemini";
+import { analyzeCases, MissingApiKeyError } from "@/lib/claude";
 
 const CaseInputSchema = z.object({
   id: z.string(),
@@ -49,22 +49,22 @@ export async function POST(request: Request) {
     if (error instanceof MissingApiKeyError) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    if (error instanceof ApiError) {
-      if (error.status === 401 || error.status === 403) {
-        return NextResponse.json(
-          { error: "Missing or invalid Gemini API key on the server." },
-          { status: 500 },
-        );
-      }
-      if (error.status === 429) {
-        return NextResponse.json(
-          { error: "API rate limit reached, please try again shortly." },
-          { status: 429 },
-        );
-      }
-      console.error("Gemini API error:", error.status, error.message);
+    if (error instanceof Anthropic.AuthenticationError) {
       return NextResponse.json(
-        { error: `Gemini API error: ${error.message}` },
+        { error: "Missing or invalid Anthropic API key on the server." },
+        { status: 500 },
+      );
+    }
+    if (error instanceof Anthropic.RateLimitError) {
+      return NextResponse.json(
+        { error: "API rate limit reached, please try again shortly." },
+        { status: 429 },
+      );
+    }
+    if (error instanceof Anthropic.APIError) {
+      console.error("Claude API error:", error.status, error.message);
+      return NextResponse.json(
+        { error: `Claude API error: ${error.message}` },
         { status: 502 },
       );
     }

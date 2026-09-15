@@ -165,7 +165,7 @@ export function WorklistView() {
               ? "Analyzing…"
               : hasAnalysis
                 ? "Re-run AI triage"
-                : "Run AI triage (Gemini)"}
+                : "Run AI triage (Claude)"}
           </button>
         </div>
       </div>
