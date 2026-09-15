@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Separate Python project — not part of the Next.js/TS lint scope.
+    "backend/**",
   ]),
 ]);
 
