@@ -9,5 +9,7 @@ on run
 		do shell script "cd " & quoted form of projectPath & " && (/opt/homebrew/bin/npm run dev > /tmp/aidoc-dev.log 2>&1 &) ; sleep 1"
 		delay 2
 	end if
-	open location "http://localhost:3000/worklist"
+	-- Ouvre Chrome en "mode appli" : pas de barre d'adresse ni d'onglets,
+	-- fenêtre autonome qui ressemble à une vraie application.
+	do shell script "open -na 'Google Chrome' --args --app=http://localhost:3000/worklist --window-size=1400,900"
 end run
