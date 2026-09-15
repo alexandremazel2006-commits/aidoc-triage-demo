@@ -67,6 +67,14 @@ export interface ReportResult {
   created_at: string | null;
 }
 
+export type ReviewDecision = "confirmed" | "rejected" | "needs_further_review";
+
+export interface ReviewResult {
+  decision: ReviewDecision | null;
+  notes: string | null;
+  reviewed_at: string | null;
+}
+
 export class RadioCheckApiError extends Error {}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -128,5 +136,21 @@ export function saveReport(id: string, editedText: string): Promise<ReportResult
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ edited_text: editedText }),
+  });
+}
+
+export function getReview(id: string): Promise<ReviewResult> {
+  return request<ReviewResult>(`/api/exams/${id}/review`);
+}
+
+export function saveReview(
+  id: string,
+  decision: ReviewDecision,
+  notes: string,
+): Promise<ReviewResult> {
+  return request<ReviewResult>(`/api/exams/${id}/review`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ decision, notes: notes || null }),
   });
 }

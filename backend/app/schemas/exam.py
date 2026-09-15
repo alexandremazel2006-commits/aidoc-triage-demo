@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -65,3 +66,17 @@ class ReportOut(BaseModel):
 
 class ReportUpdateIn(BaseModel):
     edited_text: str
+
+
+ReviewDecision = Literal["confirmed", "rejected", "needs_further_review"]
+
+
+class ReviewOut(BaseModel):
+    decision: ReviewDecision | None
+    notes: str | None
+    reviewed_at: datetime | None
+
+
+class ReviewIn(BaseModel):
+    decision: ReviewDecision
+    notes: str | None = None

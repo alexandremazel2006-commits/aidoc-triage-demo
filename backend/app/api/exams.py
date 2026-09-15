@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
@@ -8,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.exam import Exam, Prediction, Report
+from app.models.exam import Exam, Prediction, Report, Review
 from app.schemas.exam import (
     AnalyzeResponse,
     ExamDetailOut,
@@ -17,6 +18,8 @@ from app.schemas.exam import (
     PredictionOut,
     ReportOut,
     ReportUpdateIn,
+    ReviewIn,
+    ReviewOut,
 )
 from app.services.ai_model import get_model
 from app.services.gradcam import UnknownConditionError, array_to_grayscale_png, compute_gradcam
@@ -206,4 +209,48 @@ def save_report(exam_id: str, payload: ReportUpdateIn, db: Session = Depends(get
         draft_text=exam.report.draft_text,
         edited_text=exam.report.edited_text,
         created_at=exam.report.created_at,
+    )
+
+
+@router.get("/{exam_id}/review", response_model=ReviewOut)
+def get_review(exam_id: str, db: Session = Depends(get_db)):
+    exam = db.get(Exam, exam_id)
+    if exam is None:
+        raise HTTPException(status_code=404, detail="Exam not found.")
+
+    if exam.review is None:
+        return ReviewOut(decision=None, notes=None, reviewed_at=None)
+
+    return ReviewOut(
+        decision=exam.review.decision,
+        notes=exam.review.notes,
+        reviewed_at=exam.review.reviewed_at,
+    )
+
+
+@router.post("/{exam_id}/review", response_model=ReviewOut)
+def save_review(exam_id: str, payload: ReviewIn, db: Session = Depends(get_db)):
+    exam = db.get(Exam, exam_id)
+    if exam is None:
+        raise HTTPException(status_code=404, detail="Exam not found.")
+
+    if exam.review is None:
+        exam.review = Review(decision=payload.decision, notes=payload.notes)
+    else:
+        exam.review.decision = payload.decision
+        exam.review.notes = payload.notes
+        exam.review.reviewed_at = datetime.now(timezone.utc)
+
+    # A human has now looked at this case — the demo workflow status
+    # reflects that regardless of which decision they made.
+    exam.review_status = "Reviewed"
+
+    db.add(exam)
+    db.commit()
+    db.refresh(exam)
+
+    return ReviewOut(
+        decision=exam.review.decision,
+        notes=exam.review.notes,
+        reviewed_at=exam.review.reviewed_at,
     )

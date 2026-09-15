@@ -12,6 +12,7 @@ import {
 import { GradCamPanel } from "./GradCamPanel";
 import { PriorityBadge } from "./PriorityBadge";
 import { ReportPanel } from "./ReportPanel";
+import { ReviewPanel } from "./ReviewPanel";
 
 const RESULTS_PREVIEW_COUNT = 5;
 
@@ -20,13 +21,15 @@ export function ExamDetailView({ examId }: { examId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
 
-  useEffect(() => {
+  function reload() {
     getExam(examId)
       .then(setExam)
       .catch((e) =>
         setError(e instanceof RadioCheckApiError ? e.message : "Failed to load exam."),
       );
-  }, [examId]);
+  }
+
+  useEffect(reload, [examId]);
 
   if (error) {
     return (
@@ -115,6 +118,8 @@ export function ExamDetailView({ examId }: { examId: string }) {
               clinically validated.
             </p>
           </div>
+
+          <ReviewPanel examId={exam.id} onReviewed={reload} />
         </div>
       </div>
 
