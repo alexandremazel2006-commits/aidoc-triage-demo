@@ -55,3 +55,13 @@ class HeatmapResponse(BaseModel):
     image_base64: str = Field(..., description="PNG, base64-encoded — the 224x224 preprocessed image the model actually saw.")
     heatmap_base64: str = Field(..., description="PNG, base64-encoded — real Grad-CAM heatmap for `condition`.")
     available_conditions: list[str]
+
+
+class ReportOut(BaseModel):
+    draft_text: str
+    edited_text: str | None
+    created_at: datetime | None
+
+
+class ReportUpdateIn(BaseModel):
+    edited_text: str

@@ -61,6 +61,12 @@ export interface HeatmapResult {
   available_conditions: string[];
 }
 
+export interface ReportResult {
+  draft_text: string;
+  edited_text: string | null;
+  created_at: string | null;
+}
+
 export class RadioCheckApiError extends Error {}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -111,4 +117,16 @@ export function getHeatmap(id: string, condition: string): Promise<HeatmapResult
   return request<HeatmapResult>(
     `/api/exams/${id}/heatmap?condition=${encodeURIComponent(condition)}`,
   );
+}
+
+export function getReport(id: string): Promise<ReportResult> {
+  return request<ReportResult>(`/api/exams/${id}/report`);
+}
+
+export function saveReport(id: string, editedText: string): Promise<ReportResult> {
+  return request<ReportResult>(`/api/exams/${id}/report`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ edited_text: editedText }),
+  });
 }

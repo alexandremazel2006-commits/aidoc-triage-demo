@@ -11,6 +11,7 @@ import {
 
 import { GradCamPanel } from "./GradCamPanel";
 import { PriorityBadge } from "./PriorityBadge";
+import { ReportPanel } from "./ReportPanel";
 
 const RESULTS_PREVIEW_COUNT = 5;
 
@@ -117,12 +118,13 @@ export function ExamDetailView({ examId }: { examId: string }) {
         </div>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <GradCamPanel
           examId={exam.id}
           defaultCondition={exam.predictions[0]?.condition ?? ""}
           conditionOptions={exam.predictions.map((p) => p.condition)}
         />
+        <ReportPanel examId={exam.id} />
       </div>
     </div>
   );

@@ -8,13 +8,15 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.exam import Exam, Prediction
+from app.models.exam import Exam, Prediction, Report
 from app.schemas.exam import (
     AnalyzeResponse,
     ExamDetailOut,
     ExamSummaryOut,
     HeatmapResponse,
     PredictionOut,
+    ReportOut,
+    ReportUpdateIn,
 )
 from app.services.ai_model import get_model
 from app.services.gradcam import UnknownConditionError, array_to_grayscale_png, compute_gradcam
@@ -26,6 +28,7 @@ from app.services.preprocessing import (
     preprocess_image_bytes_full,
 )
 from app.services.priority_engine import compute_priority
+from app.services.report_generator import generate_draft_report
 from app.utils.files import (
     UploadValidationError,
     generate_patient_id,
@@ -162,4 +165,45 @@ def get_heatmap(exam_id: str, condition: str = Query(...), db: Session = Depends
         image_base64=base64.b64encode(original_png).decode("ascii"),
         heatmap_base64=base64.b64encode(heatmap_png).decode("ascii"),
         available_conditions=[p for p in model.pathologies if p],
+    )
+
+
+@router.get("/{exam_id}/report", response_model=ReportOut)
+def get_report(exam_id: str, db: Session = Depends(get_db)):
+    exam = db.get(Exam, exam_id)
+    if exam is None:
+        raise HTTPException(status_code=404, detail="Exam not found.")
+
+    if exam.report is not None:
+        return ReportOut(
+            draft_text=exam.report.draft_text,
+            edited_text=exam.report.edited_text,
+            created_at=exam.report.created_at,
+        )
+
+    # No saved report yet — generate a preview without persisting it.
+    return ReportOut(draft_text=generate_draft_report(exam), edited_text=None, created_at=None)
+
+
+@router.put("/{exam_id}/report", response_model=ReportOut)
+def save_report(exam_id: str, payload: ReportUpdateIn, db: Session = Depends(get_db)):
+    exam = db.get(Exam, exam_id)
+    if exam is None:
+        raise HTTPException(status_code=404, detail="Exam not found.")
+
+    if exam.report is None:
+        exam.report = Report(
+            draft_text=generate_draft_report(exam), edited_text=payload.edited_text
+        )
+    else:
+        exam.report.edited_text = payload.edited_text
+
+    db.add(exam)
+    db.commit()
+    db.refresh(exam)
+
+    return ReportOut(
+        draft_text=exam.report.draft_text,
+        edited_text=exam.report.edited_text,
+        created_at=exam.report.created_at,
     )
