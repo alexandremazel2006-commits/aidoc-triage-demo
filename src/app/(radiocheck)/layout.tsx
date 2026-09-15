@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
+
 import { Sidebar } from "@/components/radiocheck/Sidebar";
+
+export const metadata: Metadata = {
+  title: {
+    template: "%s — RadioCheck AI",
+    default: "RadioCheck AI",
+  },
+};
 
 export default function RadioCheckLayout({ children }: { children: React.ReactNode }) {
   return (

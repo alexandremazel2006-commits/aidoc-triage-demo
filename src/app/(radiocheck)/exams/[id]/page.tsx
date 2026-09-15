@@ -1,5 +1,7 @@
 import { ExamDetailView } from "@/components/radiocheck/ExamDetailView";
 
+export const metadata = { title: "Exam Detail" };
+
 export default async function ExamPage({
   params,
 }: {

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import {
@@ -206,6 +207,13 @@ export function AnalyzeView() {
                 clinical probabilities. This is a university research
                 prototype, not a certified diagnostic device.
               </p>
+
+              <Link
+                href={`/exams/${result.exam_id}`}
+                className="block w-full rounded-md bg-slate-900 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-slate-800"
+              >
+                View full exam — Grad-CAM &amp; report →
+              </Link>
             </div>
           ) : (
             <div className="flex h-full min-h-64 items-center justify-center rounded-lg border border-dashed border-slate-200 text-sm text-slate-400">

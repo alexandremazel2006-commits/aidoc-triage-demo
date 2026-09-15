@@ -16,14 +16,17 @@ export function Sidebar() {
 
   return (
     <aside className="flex w-56 shrink-0 flex-col border-r border-slate-200 bg-white">
-      <div className="flex items-center gap-2 border-b border-slate-100 px-5 py-4">
+      <Link
+        href="/radiocheck"
+        className="flex items-center gap-2 border-b border-slate-100 px-5 py-4 hover:bg-slate-50"
+      >
         <span className="flex h-7 w-7 items-center justify-center rounded bg-blue-600 text-sm font-bold text-white">
           R
         </span>
         <span className="text-sm font-semibold text-slate-900">
           RadioCheck AI
         </span>
-      </div>
+      </Link>
       <nav className="flex-1 space-y-1 px-3 py-4">
         {NAV_ITEMS.map((item) => {
           const active = pathname === item.href;
